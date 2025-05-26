@@ -20,6 +20,7 @@
 package liquibase.ext.clickhouse.sqlgenerator.changeloglock;
 
 import liquibase.database.Database;
+import liquibase.ext.clickhouse.database.ClickHouseDatabase;
 import liquibase.ext.clickhouse.params.ParamsLoader;
 import liquibase.ext.clickhouse.sqlgenerator.SqlGeneratorUtil;
 import liquibase.ext.clickhouse.sqlgenerator.changeloglock.template.SelectLockTemplate;
@@ -34,6 +35,11 @@ public class SelectFromDatabaseChangeLogLockGeneratorClickHouse
     @Override
     public int getPriority() {
         return PRIORITY_DATABASE;
+    }
+
+    @Override
+    public boolean supports(SelectFromDatabaseChangeLogLockStatement statement, Database database) {
+        return database instanceof ClickHouseDatabase;
     }
 
     @Override
