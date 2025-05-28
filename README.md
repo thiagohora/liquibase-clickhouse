@@ -82,7 +82,7 @@ paths in your zookeeper:
   gpg --import genestack-public.pgp
   ```
 
-3) OPTIONAL! Make sure it's public key is published.
+3) OPTIONAL! Make sure public key is published.
 
   ```shell
   gpg --list-keys
