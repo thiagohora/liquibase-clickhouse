@@ -1,5 +1,7 @@
 Forked from [liquibase-clickhouse](https://github.com/MEDIARITHMICS/liquibase-clickhouse) to enable support of clickhouse cluster.
 
+# liquibase-clickhouse [![maven][maven-image]][maven-url]
+
 [maven-image]: https://img.shields.io/maven-central/v/com.genestack/liquibase-clickhouse.svg?maxAge=259200&style=for-the-badge&color=brithgreen&label=com.genestack:liquibase-clickhouse
 [maven-url]: https://mvnrepository.com/artifact/com.genestack/liquibase-clickhouse
 
