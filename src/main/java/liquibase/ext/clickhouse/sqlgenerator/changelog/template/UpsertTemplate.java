@@ -20,7 +20,6 @@
 package liquibase.ext.clickhouse.sqlgenerator.changelog.template;
 
 import liquibase.database.Database;
-import liquibase.datatype.DataTypeFactory;
 import liquibase.ext.clickhouse.params.ClusterConfig;
 import liquibase.ext.clickhouse.params.StandaloneConfig;
 import liquibase.ext.clickhouse.sqlgenerator.LiquibaseSqlTemplate;
@@ -32,8 +31,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class UpsertTemplate extends LiquibaseSqlTemplate<String> {
-
-    private static final DataTypeFactory DATA_TYPE_FACTORY = DataTypeFactory.getInstance();
 
     private final OnClusterTemplate onClusterTemplate = new OnClusterTemplate();
     private final Database database;
@@ -87,9 +84,5 @@ public class UpsertTemplate extends LiquibaseSqlTemplate<String> {
             database.getDatabaseChangeLogTableName(),
             unescapedId
         );
-    }
-
-    private String escape(Database database, Object value) {
-        return DATA_TYPE_FACTORY.fromObject(value, database).objectToSql(value, database);
     }
 }

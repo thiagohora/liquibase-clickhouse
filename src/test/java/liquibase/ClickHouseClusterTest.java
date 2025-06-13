@@ -52,6 +52,7 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
     }
 
     @Override
+    @Test
     void canTagDatabase() {
         runLiquibase(
             "changelog-cluster.xml",
@@ -63,6 +64,7 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
     }
 
     @Override
+    @Test
     void canRollbackChangelog() {
         runLiquibase(
             "changelog-cluster.xml",

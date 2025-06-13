@@ -20,6 +20,7 @@
 package liquibase;
 
 import liquibase.change.custom.CustomTaskChange;
+import liquibase.change.custom.CustomTaskRollback;
 import liquibase.database.Database;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.CustomChangeException;
@@ -29,7 +30,7 @@ import liquibase.resource.ResourceAccessor;
 
 import java.sql.Statement;
 
-public class CustomChange implements CustomTaskChange {
+public class CustomCHChange implements CustomTaskChange, CustomTaskRollback {
 
     @Override
     public void execute(Database database) throws CustomChangeException {
@@ -57,5 +58,16 @@ public class CustomChange implements CustomTaskChange {
     @Override
     public ValidationErrors validate(Database database) {
         return null;
+    }
+
+    @Override
+    public void rollback(Database database) throws CustomChangeException {
+        JdbcConnection connection = (JdbcConnection) database.getConnection();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE DataByRowShard ON CLUSTER '{cluster}' " +
+                              "DELETE WHERE rowId = 101 AND item = 'custom';");
+        } catch (Exception e) {
+            throw new CustomChangeException(e.getMessage(), e);
+        }
     }
 }
