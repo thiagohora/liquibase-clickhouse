@@ -36,7 +36,7 @@ public class CustomCHChange implements CustomTaskChange, CustomTaskRollback {
     public void execute(Database database) throws CustomChangeException {
         JdbcConnection connection = (JdbcConnection) database.getConnection();
         try (Statement statement = connection.createStatement()) {
-            statement.execute("INSERT INTO DataByRowDist(rowId, item) VALUES (101, 'custom');");
+            statement.execute("INSERT INTO DataByRowDist(rowId, item) VALUES (101, 'custom')");
         } catch (Exception e) {
             throw new CustomChangeException(e.getMessage(), e);
         }
@@ -64,8 +64,8 @@ public class CustomCHChange implements CustomTaskChange, CustomTaskRollback {
     public void rollback(Database database) throws CustomChangeException {
         JdbcConnection connection = (JdbcConnection) database.getConnection();
         try (Statement statement = connection.createStatement()) {
-            statement.execute("ALTER TABLE DataByRowShard ON CLUSTER '{cluster}' " +
-                              "DELETE WHERE rowId = 101 AND item = 'custom';");
+            statement.execute("DELETE FROM DataByRowShard ON CLUSTER '{cluster}' " +
+                              "WHERE rowId = 101 AND item = 'custom'");
         } catch (Exception e) {
             throw new CustomChangeException(e.getMessage(), e);
         }

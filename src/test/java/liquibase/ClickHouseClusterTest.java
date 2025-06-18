@@ -37,7 +37,6 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -51,36 +50,12 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
         setConfig(new ClusterConfig("default", "/liquibase"));
     }
 
-    @Override
-    @Test
-    void canTagDatabase() {
-        runLiquibase(
-            "changelog-cluster.xml",
-            (liquibase, connection) -> {
-                liquibase.update("");
-                liquibase.tag("testTag");
-            }
-        );
-    }
-
-    @Override
-    @Test
-    void canRollbackChangelog() {
-        runLiquibase(
-            "changelog-cluster.xml",
-            (liquibase, connection) -> {
-                liquibase.update("");
-                liquibase.rollback(2, "");
-            }
-        );
-    }
-
     @Test
     void canPerformCustomMigration() {
         @Language("ClickHouse")
         final String checkStatement = "select count(*) from DataByRowDist where item = 'custom'";
         runLiquibase(
-            "changelog-cluster.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> {
                 liquibase.update("");
                 try (Statement stmt = connection.createStatement()) {
@@ -88,16 +63,6 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
                     try (var rs = stmt.getResultSet()) {
                         rs.next();
                         assertEquals(1, rs.getInt(1));
-                    } catch (AssertionError e) {
-                        // poor man's backoff
-                        TimeUnit.SECONDS.sleep(5);
-                        try (Statement stmt2 = connection.createStatement()) {
-                            stmt2.execute(checkStatement);
-                            try (var rs2 = stmt2.getResultSet()) {
-                                rs2.next();
-                                assertEquals(1, rs2.getInt(1));
-                            }
-                        }
                     }
                 }
             }
@@ -108,7 +73,7 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
     @RepeatedTest(30)
     void canRunComplexMigrationsWithInsertions() {
         runLiquibase(
-            "changelog-cluster.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> {
                 liquibase.update("");
                 try (Statement stmt = connection.createStatement()) {
@@ -162,7 +127,12 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
         }
     }
 
-    protected static DockerComposeContainer<?> withClickHouseCluster() {
+    @Override
+    protected String getChangelogFileName() {
+        return "changelog-cluster.xml";
+    }
+
+    static DockerComposeContainer<?> withClickHouseCluster() {
         URI uri;
         try {
             uri =

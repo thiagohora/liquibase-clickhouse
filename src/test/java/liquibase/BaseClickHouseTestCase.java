@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.io.output.NullWriter;
 
 import java.sql.Connection;
+import java.time.Instant;
+import java.util.Date;
 
 abstract class BaseClickHouseTestCase {
     @Test
@@ -42,7 +44,7 @@ abstract class BaseClickHouseTestCase {
     void canExecuteChangelog() {
         // Expected single row from
         runLiquibase(
-            "changelog.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> {
                 liquibase.update();
                 liquibase.update(); // Test that successive updates are working
@@ -53,10 +55,10 @@ abstract class BaseClickHouseTestCase {
     @Test
     void canRollbackChangelog() {
         runLiquibase(
-            "changelog.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> {
                 liquibase.update();
-                liquibase.rollback(2, "");
+                liquibase.rollback(Date.from(Instant.EPOCH), "");
             }
         );
     }
@@ -64,7 +66,7 @@ abstract class BaseClickHouseTestCase {
     @Test
     void canTagDatabase() {
         runLiquibase(
-            "changelog.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> {
                 liquibase.update();
                 liquibase.tag("testTag");
@@ -74,41 +76,43 @@ abstract class BaseClickHouseTestCase {
 
     @Test
     void canValidate() {
-        runLiquibase("changelog.xml", (liquibase, connection) -> liquibase.validate());
+        runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.validate());
     }
 
     @Test
     void canListLocks() {
-        runLiquibase("changelog.xml", (liquibase, connection) -> liquibase.listLocks());
+        runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.listLocks());
     }
 
     @Test
     void canSyncChangelog() {
         // ERROR: Exception Primary Reason: Result set larger than one row
-        runLiquibase("changelog.xml", (liquibase, connection) -> liquibase.changeLogSync(""));
+        runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.changeLogSync(""));
     }
 
     @Test
     void canForceReleaseLocks() {
-        runLiquibase("changelog.xml", (liquibase, connection) -> liquibase.forceReleaseLocks());
+        runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.forceReleaseLocks());
     }
 
     @Test
     void canReportStatus() {
         runLiquibase(
-            "changelog.xml",
+            getChangelogFileName(),
             (liquibase, connection) -> liquibase.reportStatus(true, "", new NullWriter())
         );
     }
 
     @Test
     void canMarkChangeSetRan() {
-        runLiquibase("changelog.xml", (liquibase, connection) -> liquibase.markNextChangeSetRan(""));
+        runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.markNextChangeSetRan(""));
     }
 
     protected abstract void doWithConnection(ThrowingConsumer<Connection> callback);
 
-    protected void runLiquibase(
+    protected abstract String getChangelogFileName();
+
+    void runLiquibase(
         String changelog, ThrowingBiConsumer<Liquibase, Connection> liquibaseAction
     ) {
         DatabaseFactory dbFactory = DatabaseFactory.getInstance();
@@ -128,7 +132,7 @@ abstract class BaseClickHouseTestCase {
         }
     }
 
-    protected static void setConfig(LiquibaseClickHouseConfig config)
+    static void setConfig(LiquibaseClickHouseConfig config)
         throws NoSuchFieldException, IllegalAccessException {
         var f = ParamsLoader.class.getDeclaredField("liquibaseClickhouseProperties");
         f.setAccessible(true);

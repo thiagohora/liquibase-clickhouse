@@ -51,11 +51,11 @@
         </sql>
         <rollback>
             <![CDATA[
-            DROP TABLE IF EXISTS DataByRowDist ON CLUSTER '{cluster}';
-            DROP TABLE IF EXISTS DataByRowShard ON CLUSTER '{cluster}';
-            DROP DICTIONARY IF EXISTS IndexDict ON CLUSTER '{cluster}';
-            DROP TABLE IF EXISTS IndexDist ON CLUSTER '{cluster}';
-            DROP TABLE IF EXISTS IndexShard ON CLUSTER '{cluster}';
+            DROP TABLE IF EXISTS DataByRowDist ON CLUSTER '{cluster}' SYNC;
+            DROP TABLE IF EXISTS DataByRowShard ON CLUSTER '{cluster}' SYNC;
+            DROP DICTIONARY IF EXISTS IndexDict ON CLUSTER '{cluster}' SYNC;
+            DROP TABLE IF EXISTS IndexDist ON CLUSTER '{cluster}' SYNC;
+            DROP TABLE IF EXISTS IndexShard ON CLUSTER '{cluster}' SYNC;
             ]]>
         </rollback>
     </changeSet>
