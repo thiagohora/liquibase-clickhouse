@@ -27,10 +27,12 @@ import liquibase.ext.clickhouse.params.LiquibaseClickHouseConfig;
 import liquibase.ext.clickhouse.params.ParamsLoader;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.io.output.NullWriter;
 
 import java.sql.Connection;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Date;
 
@@ -106,6 +108,22 @@ abstract class BaseClickHouseTestCase {
     @Test
     void canMarkChangeSetRan() {
         runLiquibase(getChangelogFileName(), (liquibase, connection) -> liquibase.markNextChangeSetRan(""));
+    }
+
+    @Test
+    void canUpdateCheckSums() {
+        @Language("ClickHouse")
+        final String clearCheckSum = "ALTER TABLE DATABASECHANGELOG UPDATE MD5SUM = '' WHERE TRUE";
+        runLiquibase(
+            getChangelogFileName(),
+            (liquibase, connection) -> {
+                liquibase.update("");
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.execute(clearCheckSum);
+                }
+                liquibase.update("");
+            }
+        );
     }
 
     protected abstract void doWithConnection(ThrowingConsumer<Connection> callback);
