@@ -20,11 +20,13 @@
  */
 package liquibase;
 
+import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.ext.clickhouse.params.LiquibaseClickHouseConfig;
 import liquibase.ext.clickhouse.params.ParamsLoader;
+import liquibase.ext.clickhouse.sqlgenerator.changelog.ChangelogColumns;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.intellij.lang.annotations.Language;
@@ -32,9 +34,17 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.io.output.NullWriter;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 abstract class BaseClickHouseTestCase {
     @Test
@@ -126,9 +136,72 @@ abstract class BaseClickHouseTestCase {
         );
     }
 
+    @Test
+    void canExecuteRunAlwaysChangeSetTwice() {
+        runLiquibase(
+            getChangelogFileName(), (liquibase, connection) -> {
+                // The first run should execute the runAlways changeSet
+                liquibase.update("");
+                String runAlwaysChangeSetId = getRunAlwaysChangeSetId();
+                var runAlwaysChangeSet = getChangeLogRow(runAlwaysChangeSetId, connection);
+                assertFalse(runAlwaysChangeSet.get(ChangelogColumns.MD5SUM).toString().isEmpty());
+                // Check that the changeSet was executed, the value is either
+                // EXECUTED (in case of a first run) or RERAN (in case other testcases were run before)
+                assertTrue(List.of(ChangeSet.ExecType.EXECUTED.name(), ChangeSet.ExecType.RERAN.name())
+                    .contains(runAlwaysChangeSet.get(ChangelogColumns.EXECTYPE)));
+                assertTrue(runAlwaysChangeSet.get(ChangelogColumns.COMMENTS).toString()
+                    .endsWith("Inserting some data on each run..."));
+
+                // Manually update DATABASECHANGELOG to simulate a change
+                @Language("ClickHouse")
+                String updateSql = "ALTER TABLE DATABASECHANGELOG UPDATE MD5SUM = ?, COMMENTS = ? WHERE ID = ?";
+                try (var pstmt = connection.prepareStatement(updateSql)) {
+                    pstmt.setString(1, "");
+                    pstmt.setString(2, "sample comment");
+                    pstmt.setString(3, runAlwaysChangeSetId);
+                    pstmt.execute();
+                }
+                Thread.sleep(2000); //ensure the changes are visible
+                runAlwaysChangeSet = getChangeLogRow(runAlwaysChangeSetId, connection);
+                assertEquals("", runAlwaysChangeSet.get(ChangelogColumns.MD5SUM));
+                assertEquals("sample comment", runAlwaysChangeSet.get(ChangelogColumns.COMMENTS));
+
+                // The second run should execute the runAlways changeSet again
+                liquibase.update();
+                runAlwaysChangeSet = getChangeLogRow(runAlwaysChangeSetId, connection);
+                assertFalse(runAlwaysChangeSet.get(ChangelogColumns.MD5SUM).toString().isEmpty());
+                assertEquals(ChangeSet.ExecType.RERAN.name(), runAlwaysChangeSet.get(ChangelogColumns.EXECTYPE));
+                assertTrue(runAlwaysChangeSet.get(ChangelogColumns.COMMENTS).toString()
+                    .endsWith("Inserting some data on each run..."));
+            }
+        );
+    }
+
+    private static Map<ChangelogColumns, Object> getChangeLogRow(String id, Connection connection)
+        throws SQLException {
+        @Language("ClickHouse")
+        String sql = "SELECT * FROM DATABASECHANGELOG WHERE ID = ?";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            try (var rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Map<ChangelogColumns, Object> row = new EnumMap<>(ChangelogColumns.class);
+                    for (ChangelogColumns column : ChangelogColumns.values()) {
+                        row.put(column, rs.getObject(column.toString()));
+                    }
+                    return row;
+                } else {
+                    throw new RuntimeException("No row found for ID = " + id);
+                }
+            }
+        }
+    }
+
     protected abstract void doWithConnection(ThrowingConsumer<Connection> callback);
 
     protected abstract String getChangelogFileName();
+
+    protected abstract String getRunAlwaysChangeSetId();
 
     void runLiquibase(
         String changelog, ThrowingBiConsumer<Liquibase, Connection> liquibaseAction

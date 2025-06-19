@@ -3,7 +3,10 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-    <changeSet id="insert-data" author="oak&amp;viacheslav.pivovarov">
+    <changeSet id="insert-data" author="oak&amp;viacheslav.pivovarov" runAlways="true">
+        <comment>
+            Inserting some data on each run...
+        </comment>
         <sql splitStatements="true">
             <![CDATA[
         INSERT INTO IndexDist(rowId, fileId, line) VALUES (1, 1, 'line1');

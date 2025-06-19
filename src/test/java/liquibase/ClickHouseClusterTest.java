@@ -132,6 +132,11 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
         return "changelog-cluster.xml";
     }
 
+    @Override
+    protected String getRunAlwaysChangeSetId() {
+        return "insert-data";
+    }
+
     static DockerComposeContainer<?> withClickHouseCluster() {
         URI uri;
         try {
