@@ -53,4 +53,14 @@ public class ClickHouseTest extends BaseClickHouseTestCase {
             fail(e);
         }
     }
+
+    @Override
+    protected String getChangelogFileName() {
+        return "changelog.xml";
+    }
+
+    @Override
+    protected String getRunAlwaysChangeSetId() {
+        return "2";
+    }
 }

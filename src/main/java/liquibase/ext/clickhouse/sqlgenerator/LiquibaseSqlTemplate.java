@@ -19,12 +19,19 @@
  */
 package liquibase.ext.clickhouse.sqlgenerator;
 
+import liquibase.database.Database;
+import liquibase.datatype.DataTypeFactory;
 import liquibase.ext.clickhouse.params.ClusterConfig;
 import liquibase.ext.clickhouse.params.LiquibaseClickHouseConfig;
 import liquibase.ext.clickhouse.params.LiquibaseConfigVisitor;
 import liquibase.ext.clickhouse.params.StandaloneConfig;
 
 public abstract class LiquibaseSqlTemplate<T> implements LiquibaseConfigVisitor<T> {
+
+    private static final DataTypeFactory DATA_TYPE_FACTORY = DataTypeFactory.getInstance();
+    protected static String escape(Database database, Object value) {
+        return DATA_TYPE_FACTORY.fromObject(value, database).objectToSql(value, database);
+    }
 
     @Override
     public T visit(ClusterConfig object) {

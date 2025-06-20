@@ -49,7 +49,14 @@ paths in your zookeeper:
 <hr/>
 
 ###### Important changes
- - 0.8.4:
+ - 0.8.5:
+   - Fixed SQL generation issues in specific cases:
+     - when rerunning `runAlways` changesets
+     - when updating checksums in case they differ from the ones in the database
+     - when tagging changesets
+   - Versions of libraries and images were updated to the latest ones
+   - Improved test coverage for various scenarios, including the above-mentioned issues
+  - 0.8.4:
    - Major update of libraries and images
    - Support of v2 ClickHouse jdbc driver (v1 for standalone mode)
    - Aligning license with the original project

@@ -6,5 +6,6 @@ liquibase.ext.clickhouse.sqlgenerator.changeloglock.UnlockDatabaseChangelogClick
 liquibase.ext.clickhouse.sqlgenerator.changelog.CreateDatabaseChangeLogTableClickHouse
 liquibase.ext.clickhouse.sqlgenerator.ModifyDataTypeClickHouse
 liquibase.ext.clickhouse.sqlgenerator.changelog.RemoveChangeSetRanStatusClickHouse
-liquibase.ext.clickhouse.sqlgenerator.changelog.UpdateChangeSetChecksumClickHouse
 liquibase.ext.clickhouse.sqlgenerator.changelog.TagDatabaseGeneratorClickhouse
+liquibase.ext.clickhouse.sqlgenerator.changelog.UpdateChangeSetChecksumClickHouse
+liquibase.ext.clickhouse.sqlgenerator.changelog.UpdateGeneratorClickhouse

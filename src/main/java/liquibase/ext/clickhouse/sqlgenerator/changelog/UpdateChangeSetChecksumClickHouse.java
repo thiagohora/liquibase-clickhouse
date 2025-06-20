@@ -25,17 +25,13 @@ import liquibase.database.Database;
 import liquibase.ext.clickhouse.database.ClickHouseDatabase;
 import liquibase.ext.clickhouse.params.ParamsLoader;
 import liquibase.ext.clickhouse.sqlgenerator.SqlGeneratorUtil;
-import liquibase.ext.clickhouse.sqlgenerator.changelog.template.UpsertTemplate;
+import liquibase.ext.clickhouse.sqlgenerator.changelog.template.UpdateTemplate;
 import liquibase.sql.Sql;
 import liquibase.sqlgenerator.SqlGeneratorChain;
 import liquibase.sqlgenerator.core.UpdateChangeSetChecksumGenerator;
 import liquibase.statement.core.UpdateChangeSetChecksumStatement;
 
 import java.util.EnumMap;
-
-import static liquibase.ext.clickhouse.sqlgenerator.changelog.ChangelogColumns.AUTHOR;
-import static liquibase.ext.clickhouse.sqlgenerator.changelog.ChangelogColumns.FILENAME;
-import static liquibase.ext.clickhouse.sqlgenerator.changelog.ChangelogColumns.MD5SUM;
 
 public class UpdateChangeSetChecksumClickHouse extends UpdateChangeSetChecksumGenerator {
 
@@ -59,10 +55,9 @@ public class UpdateChangeSetChecksumClickHouse extends UpdateChangeSetChecksumGe
         var config = ParamsLoader.getLiquibaseClickhouseProperties();
 
         var map = new EnumMap<>(ChangelogColumns.class);
-        map.put(MD5SUM, changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
-        map.put(AUTHOR, changeSet.getAuthor());
-        map.put(FILENAME, changeSet.getFilePath());
-        var query = config.accept(new UpsertTemplate(database, map, changeSet.getId()));
+        // author and filename can't be changed, as they are part of the primary key
+        map.put(ChangelogColumns.MD5SUM, changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
+        var query = config.accept(new UpdateTemplate(database, map, changeSet.getId()));
         return SqlGeneratorUtil.generateSql(database, query);
     }
 }

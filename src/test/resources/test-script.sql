@@ -7,7 +7,8 @@ CREATE TABLE test (
 ) ENGINE MergeTree() ORDER BY ID;
 --rollback DROP table test
 
---changeset test:2
+--changeset test:2 runAlways:true
+--comment: This is a Liquibase comment describing the changeset "test:2": Inserting some data on each run...
 INSERT INTO test VALUES (1, 'foo');
 INSERT INTO test VALUES (2, 'bar');
 INSERT INTO test VALUES (3, 'quz');
