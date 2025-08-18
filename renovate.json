@@ -1,9 +1,18 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:recommended"],
-    "schedule": ["* * 1 */2 *"],
+    "extends": [
+        "config:recommended"
+    ],
+    "pre-commit": {
+        "enabled": true
+    },
+    "schedule": [
+        "* */2 * * 6,0"
+    ],
     "updateNotScheduled": false,
-    "labels": ["renovate"],
+    "labels": [
+        "renovate"
+    ],
     "dockerfile": {
         "managerFilePatterns": [
             "/(^|/)(?:[\\w.-]+-)(?:docker-)?compose[^/]*\\.ya?ml$/"
