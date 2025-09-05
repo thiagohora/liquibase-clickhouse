@@ -24,7 +24,9 @@
                 "\\s*static\\s*final\\s*String\\s*(.*)\\s*=\\s*\"(?<depName>.*):(?<currentValue>.*)\""
             ],
             "datasourceTemplate": "docker"
-        },
+        }
+    ],
+    "packageRules": [
         {
             "description": "Automerge non-major updates",
             "matchUpdateTypes": ["minor", "patch"],
