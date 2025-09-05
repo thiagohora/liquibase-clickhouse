@@ -18,9 +18,12 @@
             "/(^|/)(?:[\\w.-]+-)(?:docker-)?compose[^/]*\\.ya?ml$/"
         ]
     },
-    "regexManagers": [
+    "customManagers": [
         {
-            "fileMatch": ["^.*Images\\.java$"],
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^.*Images\\.java$/"
+            ],
             "matchStrings": [
                 "\\s*static\\s*final\\s*String\\s*(.*)\\s*=\\s*\"(?<depName>.*):(?<currentValue>.*)\""
             ],
