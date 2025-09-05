@@ -1,18 +1,14 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended"
-    ],
+    "extends": ["config:recommended"],
+    "ignorePresets": [":ignoreModulesAndTests"],
+    "schedule": ["* */2 * * 6,0"],
+    "rebaseWhen": "behind-base-branch",
+    "updateNotScheduled": false,
     "pre-commit": {
         "enabled": true
     },
-    "schedule": [
-        "* */2 * * 6,0"
-    ],
-    "updateNotScheduled": false,
-    "labels": [
-        "renovate"
-    ],
+    "labels": ["renovate"],
     "dockerfile": {
         "managerFilePatterns": [
             "/(^|/)(?:[\\w.-]+-)(?:docker-)?compose[^/]*\\.ya?ml$/"
@@ -28,6 +24,13 @@
                 "\\s*static\\s*final\\s*String\\s*(.*)\\s*=\\s*\"(?<depName>.*):(?<currentValue>.*)\""
             ],
             "datasourceTemplate": "docker"
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "Automerge non-major updates",
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true
         }
     ]
 }

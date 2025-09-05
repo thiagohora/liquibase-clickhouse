@@ -1,8 +1,8 @@
-name: Pre-commit
+name: pre-commit
 
 on:
   pull_request:
-    branches: [develop]
+    branches: [master]
 
 jobs:
   pre-commit:
