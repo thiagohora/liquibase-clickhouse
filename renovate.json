@@ -5,6 +5,9 @@
     "schedule": ["* */2 * * 6,0"],
     "rebaseWhen": "behind-base-branch",
     "updateNotScheduled": false,
+    "pre-commit": {
+        "enabled": true
+    },
     "labels": ["renovate"],
     "dockerfile": {
         "managerFilePatterns": [
