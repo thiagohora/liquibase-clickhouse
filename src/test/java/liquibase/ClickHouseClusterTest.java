@@ -19,7 +19,6 @@
  */
 package liquibase;
 
-import com.clickhouse.jdbc.ClickHouseDriver;
 import liquibase.ext.clickhouse.params.ClusterConfig;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.AfterAll;
@@ -32,7 +31,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -113,13 +111,12 @@ public class ClickHouseClusterTest extends BaseClickHouseTestCase {
     @Override
     protected void doWithConnection(ThrowingConsumer<Connection> callback) {
         try {
-            Driver driver = new ClickHouseDriver();
             String url =
                 "jdbc:clickhouse://localhost:" + container.getServicePort("nginx", 8123) + "/default";
             Properties properties = new Properties();
             properties.put("user", "default");
             properties.put("password", "");
-            try (Connection con = driver.connect(url, properties)) {
+            try (Connection con = java.sql.DriverManager.getConnection(url, properties)) {
                 callback.accept(con);
             }
         } catch (Exception e) {

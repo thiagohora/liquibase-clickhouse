@@ -31,7 +31,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.apache.commons.io.output.NullWriter;
+import org.apache.commons.io.output.NullWriter;
 
 import java.sql.Connection;
 import java.sql.SQLException;
