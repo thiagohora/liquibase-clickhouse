@@ -31,7 +31,7 @@ public class ClickHouseDatabase extends AbstractJdbcDatabase {
 
     private static final String DATABASE_NAME = "ClickHouse";
     private static final int DEFAULT_PORT = 8123;
-    private static final String DRIVER_CLASS_NAME = "com.clickhouse.jdbc.ClickHouseDriver";
+    private static final String DRIVER_CLASS_NAME = "com.clickhouse.jdbc.Driver";
     public static final String CURRENT_DATE_TIME_FUNCTION =
         "toDateTime64('"
             + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss.SSS").format(new Date())
