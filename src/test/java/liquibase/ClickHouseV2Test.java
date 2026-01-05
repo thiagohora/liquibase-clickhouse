@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test class for ClickHouse JDBC V2 API.
- * This test uses the new jdbc-v2 driver with the explicit v2 flag (clickhouse.jdbc.v2=true).
+ * This test uses the new jdbc-v2 driver (v2 is the default, no flags needed).
  */
 @SuppressWarnings("JUnitTestCaseWithNoTests")
 @Testcontainers
@@ -49,9 +49,8 @@ public class ClickHouseV2Test extends BaseClickHouseTestCase {
 
     @Override
     protected void doWithConnection(BaseClickHouseTestCase.ThrowingConsumer<Connection> consumer) {
-        // Use V2 API explicitly
-        String queryString = "?clickhouse.jdbc.v2=true&externalDatabase=false";
-        try (Connection connection = clickHouseContainer.createConnection(queryString)) {
+        // Use V2 API - no query parameters needed as v2 is the default
+        try (Connection connection = clickHouseContainer.createConnection("")) {
             consumer.accept(connection);
         } catch (Exception e) {
             fail(e);
